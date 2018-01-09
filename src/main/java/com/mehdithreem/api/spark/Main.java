@@ -20,7 +20,7 @@ public class Main implements SparkApplication {
     public void init() {
 //        exception(Exception.class, (e, req, res) -> e.printStackTrace());
 
-        File staticFiles2 = new File("target/classes/webapps/spark/");
+        File staticFiles2 = new File("./demoappjava/webapps/spark/");
         staticFiles.externalLocation(staticFiles2.getAbsoluteFile().toString());
 
         get("/", (req, res) -> renderIndex(req));
