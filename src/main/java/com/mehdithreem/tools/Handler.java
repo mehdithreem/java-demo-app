@@ -1,28 +1,29 @@
-package com.mehdithreem.tools.memleak;
+package com.mehdithreem.tools;
 
 /**
- * Created by mehdithreem on 1/1/2018 AD.
+ * Created by mehdithreem on 1/10/2018 AD.
  */
-public class MemoryLeakerHandler implements Runnable {
+public class Handler<T extends Doer> implements Runnable {
     private Thread t;
-    private MemoryLeaker target;
+    private T target;
     private Boolean shouldEnd;
 
-    public MemoryLeakerHandler(MemoryLeaker target) {
+    public Handler(T target) {
         this.target = target;
         this.shouldEnd = false;
         System.out.println("Creating " +  target.getName());
     }
 
-    public MemoryLeaker getTarget() {
+    public T getTarget() {
         return target;
     }
 
-    public void setTarget(MemoryLeaker target) {
+    public void setTarget(T target) {
         this.target = target;
     }
 
-    public void end() {
+    public boolean isStarted() { return t != null; }
+    public void stop() {
         this.shouldEnd = true;
     }
 
@@ -41,15 +42,15 @@ public class MemoryLeakerHandler implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            System.out.println("MemoryLeakThread " +  target.getName() + " interrupted.");
+            System.out.println(target.getName() + " interrupted.");
         }
-        System.out.println("MemoryLeakThread " +  target.getName() + " end.");
+        System.out.println(target.getName() + " end.");
     }
 
     public void start () {
-        System.out.println("Starting " +  target.getName() );
+        System.out.println("Starting " +  target.getName());
         if (t == null) {
-            t = new Thread (this, target.getName());
+            t = new Thread (this, target.getName() + "Thread");
             t.start ();
         }
     }

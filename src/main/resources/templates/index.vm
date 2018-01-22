@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Demo JAVA 3</title>
+    <title>Demo App Control Center</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css">
@@ -11,37 +11,253 @@
             integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
             crossorigin="anonymous"></script>
     <script src="semantic/semantic.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="semantic/range.css">
+    <script src="semantic/range.js"></script>
+
+    <style>
+        .notvisible {
+            display: none !important;
+        }
+    </style>
+
+##    <script src="js/app.js"></script>
 </head>
 <body>
-<div class="ui vertical menu">
-    <div class="item">
-        <div class="header">Products</div>
-        <div class="menu">
-            <a class="item">Enterprise</a>
-            <a class="item">Consumer</a>
+<div class="ui container">
+    <h1>Memory Leak</h1>
+    <div class="ui segment">
+        <button class="ui labeled icon button" id="start-btn">
+            <i class="play icon"></i>
+            Start
+        </button>
+        <button class="ui labeled icon button notvisible" id="pause-btn">
+            <i class="pause icon"></i>
+            Pause
+        </button>
+        <button class="ui labeled icon button notvisible" id="stp-btn">
+            <i class="stop icon"></i>
+            Stop
+        </button>
+
+        #set( $leakRate = $memleak.getRate() )
+        <h3>Leak Rate (Object per Second)</h3>
+        <div class="ui disabled range" id="leak-rate"></div>
+        <div class="ui input">
+            <input type="text" disabled id="leak-rate-input">
+        </div>
+
+        #set( $leakSize = $memleak.getSize() )
+        <h3>Object Size (Byte)</h3>
+        <div class="ui disabled range" id="leak-size"></div>
+        <div class="ui input">
+            <input type="text" disabled id="leak-size-input">
         </div>
     </div>
-    <div class="item">
-        <div class="header">CMS Solutions</div>
-        <div class="menu">
-            <a class="item">Rails</a>
-            <a class="item">Python</a>
-            <a class="item">PHP</a>
+
+    <h1>Garbage Generator</h1>
+    <div class="ui segment">
+        <button class="ui labeled icon button" id="gstart-btn">
+            <i class="play icon"></i>
+            Start
+        </button>
+        <button class="ui labeled icon button notvisible" id="gpause-btn">
+            <i class="pause icon"></i>
+            Pause
+        </button>
+        <button class="ui labeled icon button notvisible" id="gstp-btn">
+            <i class="stop icon"></i>
+            Stop
+        </button>
+
+        #set( $garbageRate = $garbage.getRate() )
+        <h3>Garbage Generate Rate (Object per Second)</h3>
+        <div class="ui disabled range" id="garbage-rate"></div>
+        <div class="ui input">
+            <input type="text" disabled id="garbage-rate-input">
+        </div>
+
+        #set( $garbageSize = $garbage.getSize() )
+        <h3>Garbage Size (Byte)</h3>
+        <div class="ui disabled range" id="garbage-size"></div>
+        <div class="ui input">
+            <input type="text" disabled id="garbage-size-input">
         </div>
     </div>
-    <div class="item">
-        <div class="header">Hosting</div>
-        <div class="menu">
-            <a class="item">Shared</a>
-            <a class="item">Dedicated</a>
-        </div>
-    </div>
-    <div class="item">
-        <div class="header">Support</div>
-        <div class="menu">
-            <a class="item">E-mail Support</a>
-            <a class="item">FAQs</a>
-        </div>
-    </div>
+
+    <script>
+        $(document).ready(function () {
+            var api = "/spark/memleak";
+            var gapi = "/spark/garbage";
+
+            var initialLeakRate = '$leakRate';
+            var initialLeakSize = '$leakSize';
+
+            var initialGarbageRate = '$garbageRate';
+            var initialGarbageSize = '$garbageSize';
+
+            var setRate = function (newRate) {
+                $.ajax({
+                    url: api + "/rate",
+                    data: {
+                        "rate": newRate
+                    },
+                    type: 'post',
+                    cache: false
+                });
+            };
+            var setSize = function (newSize) {
+                $.ajax({
+                    url: api + "/size",
+                    data: {
+                        "size": newSize
+                    },
+                    type: 'post',
+                    cache: false
+                });
+            };
+
+            var runCommand = function (commmand, callback) {
+                $.ajax({
+                    url: api + "/" + commmand,
+                    type: 'post',
+                    cache: false,
+                    success: function (data) {
+                        callback();
+                    }
+                });
+            };
+
+            $('#leak-rate').range({
+                min: 0,
+                max: 5 + 10,
+                start: +initialLeakRate,
+                step: 0.1,
+                input: '#leak-rate-input',
+                onChange: function (value) {
+                    setRate(value);
+                }
+            });
+
+            $('#leak-size').range({
+                min: 0,
+                max: 1024 * 10 * 100,
+                start: +initialLeakSize,
+                step: 256,
+                input: '#leak-size-input',
+                onChange: function (value) {
+                    setSize(value);
+                }
+            });
+
+            $('#start-btn').on("click", function () {
+                runCommand("start", function () {
+                    $("#start-btn").addClass('notvisible');
+                    $("#pause-btn").removeClass('notvisible');
+                    $("#stp-btn").removeClass('notvisible');
+                    $('#leak-rate').removeClass('disabled');
+                    $('#leak-size').removeClass('disabled');
+                })
+            });
+
+            $('#pause-btn').on("click", function () {
+                runCommand("pause", function () {
+                    $("#start-btn").removeClass('notvisible');
+                    $("#pause-btn").addClass('notvisible');
+                })
+            });
+
+            $('#stp-btn').on("click", function () {
+                runCommand("stop", function () {
+                    $("#start-btn").removeClass('notvisible');
+                    $("#pause-btn").addClass('notvisible');
+                    $("#stp-btn").addClass('notvisible');
+                    $('#leak-rate').addClass('disabled');
+                    $('#leak-size').addClass('disabled');
+                })
+            });
+
+            var gsetRate = function (newRate) {
+                $.ajax({
+                    url: gapi + "/rate",
+                    data: {
+                        "rate": newRate
+                    },
+                    type: 'post',
+                    cache: false
+                });
+            };
+            var gsetSize = function (newSize) {
+                $.ajax({
+                    url: gapi + "/size",
+                    data: {
+                        "size": newSize
+                    },
+                    type: 'post',
+                    cache: false
+                });
+            };
+
+            var grunCommand = function (commmand, callback) {
+                $.ajax({
+                    url: gapi + "/" + commmand,
+                    type: 'post',
+                    cache: false,
+                    success: function (data) {
+                        callback();
+                    }
+                });
+            };
+
+            $('#garbage-rate').range({
+                min: 0,
+                max: 3000,
+                start: +initialGarbageRate,
+                step: 0.1,
+                input: '#garbage-rate-input',
+                onChange: function (value) {
+                    gsetRate(value);
+                }
+            });
+
+            $('#garbage-size').range({
+                min: 0,
+                max: 1024 * 10 * 100,
+                start: +initialGarbageSize,
+                step: 256,
+                input: '#garbage-size-input',
+                onChange: function (value) {
+                    gsetSize(value);
+                }
+            });
+
+            $('#gstart-btn').on("click", function () {
+                grunCommand("start", function () {
+                    $("#gstart-btn").addClass('notvisible');
+                    $("#gpause-btn").removeClass('notvisible');
+                    $("#gstp-btn").removeClass('notvisible');
+                    $('#garbage-rate').removeClass('disabled');
+                    $('#garbage-size').removeClass('disabled');
+                })
+            });
+
+            $('#gpause-btn').on("click", function () {
+                grunCommand("pause", function () {
+                    $("#gstart-btn").removeClass('notvisible');
+                    $("#gpause-btn").addClass('notvisible');
+                })
+            });
+
+            $('#gstp-btn').on("click", function () {
+                grunCommand("stop", function () {
+                    $("#gstart-btn").removeClass('notvisible');
+                    $("#gpause-btn").addClass('notvisible');
+                    $("#gstp-btn").addClass('notvisible');
+                    $('#garbage-rate').addClass('disabled');
+                    $('#garbage-size').addClass('disabled');
+                })
+            });
+        });
+    </script>
 </div>
 </html>

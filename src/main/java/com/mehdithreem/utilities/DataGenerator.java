@@ -1,4 +1,4 @@
-package com.mehdithreem.tools.memleak;
+package com.mehdithreem.utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 public class DataGenerator {
     private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuwyz0123456789";
 
-    static String generateRandomString(Integer count) {
+    static public String generateRandomString(int count) {
         StringBuilder builder = new StringBuilder();
         while (count-- != 0) {
             int character = (int)(Math.random()*ALPHA_NUMERIC_STRING.length());
@@ -18,7 +18,7 @@ public class DataGenerator {
         return builder.toString();
     }
 
-    static List<Integer> generateRandomIntegers(Integer lenght) {
+    static public List<Integer> generateRandomIntegers(Integer lenght) {
         List<Integer> list = new ArrayList<Integer>();
         list.add(10);
         list.add(20);
