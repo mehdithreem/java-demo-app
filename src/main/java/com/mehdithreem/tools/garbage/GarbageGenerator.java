@@ -8,7 +8,7 @@ import java.util.*;
  * Created by mehdithreem on 1/10/2018 AD.
  */
 public class GarbageGenerator implements Doer {
-    private List<LittleGarbage> garbageMap;
+    private List<LittleGarbage> garbageCan;
     private Integer counter = 0;
     private Double cumulativeRate = 0.0;
     private Boolean paused = true;
@@ -17,7 +17,7 @@ public class GarbageGenerator implements Doer {
     String name;
 
     public GarbageGenerator(String name) {
-        this.garbageMap = new LinkedList<>();
+        this.garbageCan = new LinkedList<>();
         this.name = name;
         this.counter = 0;
     }
@@ -33,30 +33,16 @@ public class GarbageGenerator implements Doer {
     public void doJob() {
         Integer count = this.doTimes();
         System.out.println("rate: " + rate.toString() + ", objSize: " + objectSize.toString() +
-                ", paused: " + paused.toString() + ", doTimes: " + count.toString() + ", listLen: " + String.valueOf(garbageMap.size()));
+                ", paused: " + paused.toString() + ", doTimes: " + count.toString() + ", listLen: " + String.valueOf(garbageCan.size()));
         if (paused)
             return;
 
-//        List<Integer> insertedKeys = new ArrayList<Integer>();
-
         for (Integer i = 0; i < count; i++) {
-            garbageMap.add(new LittleGarbage(objectSize));
-//            insertedKeys.add(counter);
+            garbageCan.add(new LittleGarbage(objectSize));
             counter++;
         }
 
-//        for(Integer i = 0; i < garbageMap.size(); i++) {
-//            garbageMap.remove(insertedKeys.get(i));
-//            garbageMap.
-//        }
-
-        while (!garbageMap.isEmpty()) {
-            garbageMap.remove(0);
-        }
-
-//        for(LittleGarbage g : garbageMap) {
-//            garbageMap.remove(g);
-//        }
+            garbageCan.clear();
     }
 
     @Override

@@ -20,8 +20,8 @@ import java.util.jar.JarFile;
 import static java.awt.Desktop.getDesktop;
 
 public class App {
-    public static String runtimeDirectory = "./demoapp";
-//    public static String runtimeDirectory = "target/classes";
+//    public static String runtimeDirectory = "./demoapp";
+    public static String runtimeDirectory = "target/classes";
     public static String defaultPort = "8080";
 
     public static void main(String a[]) throws Exception {
@@ -29,10 +29,10 @@ public class App {
     }
 
     public static void startTomcat() throws ServletException, IOException, URISyntaxException {
-        System.out.println("Preparing ...");
-
-        String jarFile = new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).toString();
-        unzipJar(runtimeDirectory, jarFile);
+//        System.out.println("Preparing ...");
+//
+//        String jarFile = new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).toString();
+//        unzipJar(runtimeDirectory, jarFile);
 
         System.out.println("Starting Tomcat ...");
 
